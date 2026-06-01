@@ -2,13 +2,6 @@
   "version": 2,
   "buildCommand": "npm run build && cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
-  "env": [
-    "DATABASE_URL",
-    "JWT_SECRET",
-    "GROQ_API_KEY",
-    "NEWSAPI_KEY",
-    "GNEWS_KEY"
-  ],
   "rewrites": [
     {
       "source": "/api/:path*",
