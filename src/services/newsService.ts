@@ -69,10 +69,6 @@ export const fetchValorEconomicoNews = async (): Promise<NewsItem[]> => {
   return [];
 };
 
-// ============================================================================
-// REST APIs
-// ============================================================================
-
 export const fetchNewsAPINews = async (keywords: string[] = []): Promise<NewsItem[]> => {
   try {
     const apiKey = process.env.NEWSAPI_KEY;
@@ -81,7 +77,6 @@ export const fetchNewsAPINews = async (keywords: string[] = []): Promise<NewsIte
       return [];
     }
 
-    // Se houver palavras-chave, usar a primeira para buscar
     const query = keywords.length > 0 ? keywords[0] : "economia Brasil";
 
     const response = await axios.get("https://newsapi.org/v2/everything", {
@@ -159,9 +154,6 @@ export const fetchGNewsNews = async (keywords: string[] = []): Promise<NewsItem[
   }
 };
 
-// ============================================================================
-// FUNÇÃO AGREGADORA
-// ============================================================================
 export const fetchAllNews = async (keywords: string[] = []): Promise<NewsItem[]> => {
   try {
     const [infoMoneyNews, valorNews, newsAPINews, gNewsNews] = await Promise.all([
@@ -187,7 +179,6 @@ export const fetchAllNews = async (keywords: string[] = []): Promise<NewsItem[]>
       ).values()
     );
 
-    // Ordenar por data (mais recentes primeiro)
     uniqueNews.sort((a, b) => {
       const dateA = new Date(a.pubDate).getTime();
       const dateB = new Date(b.pubDate).getTime();
@@ -201,9 +192,6 @@ export const fetchAllNews = async (keywords: string[] = []): Promise<NewsItem[]>
   }
 };
 
-// ============================================================================
-// FILTROS E PROCESSAMENTO
-// ============================================================================
 
 const tickerMap: Record<string, string[]> = {
   petr4: ["petrobras", "petróleo", "petr4", "pré-sal"],
