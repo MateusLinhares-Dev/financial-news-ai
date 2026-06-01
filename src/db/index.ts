@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "./schema.ts";
+import * as schema from "./schema.js";
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,11 +11,8 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Configurações para melhor compatibilidade com Supabase
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
-  // Timeout de conexão
   connectionTimeoutMillis: 5000,
-  // Timeout de query
   query_timeout: 30000,
 });
 
@@ -29,4 +26,4 @@ pool.on("connect", () => {
 
 export const db = drizzle(pool, { schema });
 
-export * from "./schema.ts";
+export * from "./schema.js";

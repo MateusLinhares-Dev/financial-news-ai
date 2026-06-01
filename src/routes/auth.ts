@@ -2,11 +2,12 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { db, users } from "../db/index.ts";
+import { db, users } from "../db/index.js";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 const router = Router();
+
 const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -37,11 +38,7 @@ router.post("/register", async (req: Request, res: Response) => {
 
     const result = await db
       .insert(users)
-      .values({
-        name,
-        email,
-        passwordHash,
-      })
+      .values({ name, email, passwordHash })
       .returning();
 
     const user = result[0];
@@ -54,15 +51,11 @@ router.post("/register", async (req: Request, res: Response) => {
 
     res.status(201).json({
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
+      user: { id: user.id, name: user.name, email: user.email },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      return res.status(400).json({ error: "Dados inválidos", details: error.issues });
     }
     console.error("Register error:", error);
     res.status(500).json({ error: "Erro ao registrar usuário" });
@@ -74,7 +67,6 @@ router.post("/login", async (req: Request, res: Response) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
 
-    // Buscar usuário
     const result = await db
       .select()
       .from(users)
@@ -87,14 +79,12 @@ router.post("/login", async (req: Request, res: Response) => {
 
     const user = result[0];
 
-    // Verificar senha
     const passwordMatch = await bcrypt.compare(password, user.passwordHash);
 
     if (!passwordMatch) {
       return res.status(401).json({ error: "Email ou senha inválidos" });
     }
 
-    // Gerar JWT
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET || "your-secret-key",
@@ -103,20 +93,15 @@ router.post("/login", async (req: Request, res: Response) => {
 
     res.json({
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
+      user: { id: user.id, name: user.name, email: user.email },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      return res.status(400).json({ error: "Dados inválidos", details: error.issues });
     }
     console.error("Login error:", error);
     res.status(500).json({ error: "Erro ao fazer login" });
   }
 });
-
 
 export default router;

@@ -1,9 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import authRoutes from "./routes/auth.ts";
-import preferencesRoutes from "./routes/preferences.ts";
-import feedRoutes from "./routes/feed.ts";
+import authRoutes from "./routes/auth.js";
+import preferencesRoutes from "./routes/preferences.js";
+import feedRoutes from "./routes/feed.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,18 +32,15 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Rotas
 app.use("/auth", authRoutes);
 app.use("/preferences", preferencesRoutes);
 app.use("/feed", feedRoutes);
 
-// Error handling
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error("Erro:", err);
   res.status(500).json({ error: "Erro interno do servidor" });
 });
 
-// 404
 app.use((req, res) => {
   res.status(404).json({ error: "Rota não encontrada" });
 });

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { db, preferences } from "../db/index.ts";
-import { authMiddleware } from "../middleware/auth.ts";
+import { db, preferences } from "../db/index.js";
+import { authMiddleware } from "../middleware/auth.js";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -38,23 +38,14 @@ router.put("/", async (req: Request, res: Response) => {
     }
 
     const { preferences: topics } = z
-      .object({
-        preferences: z.array(z.string().min(1)),
-      })
+      .object({ preferences: z.array(z.string().min(1)) })
       .parse(req.body);
 
-    // Remover preferências antigas
-    await db
-      .delete(preferences)
-      .where(eq(preferences.userId, req.user.userId));
+    await db.delete(preferences).where(eq(preferences.userId, req.user.userId));
 
-    // Inserir novas preferências
     if (topics.length > 0) {
       await db.insert(preferences).values(
-        topics.map((topic) => ({
-          userId: req.user!.userId,
-          topic,
-        }))
+        topics.map((topic) => ({ userId: req.user!.userId, topic }))
       );
     }
 
@@ -64,7 +55,7 @@ router.put("/", async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      return res.status(400).json({ error: "Dados inválidos", details: error.issues });
     }
     console.error("Erro ao atualizar preferências:", error);
     res.status(500).json({ error: "Erro ao atualizar preferências" });

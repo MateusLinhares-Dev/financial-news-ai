@@ -1,10 +1,10 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { db, preferences, feedCache } from "../db/index.ts";
-import { authMiddleware } from "../middleware/auth.ts";
+import { db, preferences, feedCache } from "../db/index.js";
+import { authMiddleware } from "../middleware/auth.js";
 import { eq } from "drizzle-orm";
-import { fetchAllNews, filterNewsByInterests } from "../services/newsService.ts";
-import { generateSummaries } from "../services/aiService.ts";
+import { fetchAllNews, filterNewsByInterests } from "../services/newsService.js";
+import { generateSummaries } from "../services/aiService.js";
 
 const router = Router();
 
@@ -28,20 +28,15 @@ const generateFeed = async (userId: number): Promise<FeedResponse> => {
     .where(eq(preferences.userId, userId));
 
   const topics = userPreferences.map((p) => p.topic);
-
   const news = await fetchAllNews(topics);
-
   const filteredNews = filterNewsByInterests(news, topics);
-
   const summaries = await generateSummaries(filteredNews, topics);
 
-  const feedData: FeedResponse = {
+  return {
     generatedAt: new Date().toISOString(),
     interests: topics,
     items: summaries,
   };
-
-  return feedData;
 };
 
 // GET /feed
@@ -51,7 +46,6 @@ router.get("/", async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Não autenticado" });
     }
 
-    // Verificar cache (válido por 24 horas)
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
@@ -61,19 +55,13 @@ router.get("/", async (req: Request, res: Response) => {
       .where(eq(feedCache.userId, req.user.userId))
       .limit(1);
 
-    if (
-      cached.length > 0 &&
-      new Date(cached[0].generatedAt) > oneDayAgo
-    ) {
+    if (cached.length > 0 && new Date(cached[0].generatedAt) > oneDayAgo) {
       return res.json(cached[0].contentJson);
     }
 
     const feedData = await generateFeed(req.user.userId);
 
-    await db
-      .delete(feedCache)
-      .where(eq(feedCache.userId, req.user.userId));
-
+    await db.delete(feedCache).where(eq(feedCache.userId, req.user.userId));
     await db.insert(feedCache).values({
       userId: req.user.userId,
       contentJson: feedData,
@@ -90,15 +78,14 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
+// POST /feed/refresh
 router.post("/refresh", async (req: Request, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: "Não autenticado" });
     }
 
-    await db
-      .delete(feedCache)
-      .where(eq(feedCache.userId, req.user.userId));
+    await db.delete(feedCache).where(eq(feedCache.userId, req.user.userId));
 
     const feedData = await generateFeed(req.user.userId);
 
