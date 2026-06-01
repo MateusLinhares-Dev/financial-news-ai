@@ -8,5 +8,15 @@
     "GROQ_API_KEY",
     "NEWSAPI_KEY",
     "GNEWS_KEY"
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
