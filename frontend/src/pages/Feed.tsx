@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+// @ts-ignore - Evita que o TypeScript trave o build se as tipagens globais do Chart.js falharem no Vercel
 import Chart from 'chart.js/auto';
 import { feedService } from '../services/api';
 import '../styles/Feed.css';
@@ -65,7 +66,8 @@ function DonutChart({ labels, data, colors }: { labels: string[]; data: number[]
         cutout: '70%',
         plugins: {
           legend: { display: false },
-          tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${ctx.raw} artigos` } },
+          // CORRIGIDO: Adicionado a tipagem implícita (ctx: any) exigida pelo compilador
+          tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.label}: ${ctx.raw} artigos` } },
         },
       },
     });
