@@ -159,14 +159,14 @@ financial-news-ai/
 - CORS configurado
 - Sem credenciais no repositório
 
-## 🚢 Deploy no Vercel (Simples!)
+## 🚢 Deploy no Vercel 
 
 ### Passo 1: Preparar o repositório Git
 ```bash
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin <seu-repo-github>
+git remote add origin https://github.com/um-dr-lino/financial-news-ai
 git push -u origin main
 ```
 
@@ -186,19 +186,6 @@ No painel do Vercel, adicione as seguintes variáveis (Environment Variables):
 | `GROQ_API_KEY` | Sua chave Groq | Secret |
 | `NEWSAPI_KEY` | Sua chave NewsAPI (opcional) | Secret |
 | `GNEWS_KEY` | Sua chave GNews (opcional) | Secret |
-
-**Dica**: Gere um JWT_SECRET com:
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-### Passo 4: Deploy
-Clique em "Deploy" e aguarde. O Vercel fará:
-1. Build do backend (TypeScript → JavaScript)
-2. Build do frontend (Vite)
-3. Deploy automático
-
-**Pronto!** Seu projeto estará disponível em `https://seu-projeto.vercel.app`
 
 ## 📝 Exemplo de Uso
 
@@ -280,4 +267,3 @@ Desenvolvido como desafio técnico para Manchester Investimentos
 
 **Pronto para começar?** Clone o repositório e siga as instruções acima!
 
-Para dúvidas sobre o deploy, consulte o arquivo `GUIA_VERCEL_DEPLOY.md`.

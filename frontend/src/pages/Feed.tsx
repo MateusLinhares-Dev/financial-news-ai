@@ -66,7 +66,6 @@ function DonutChart({ labels, data, colors }: { labels: string[]; data: number[]
         cutout: '70%',
         plugins: {
           legend: { display: false },
-          // CORRIGIDO: Adicionado a tipagem implícita (ctx: any) exigida pelo compilador
           tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.label}: ${ctx.raw} artigos` } },
         },
       },

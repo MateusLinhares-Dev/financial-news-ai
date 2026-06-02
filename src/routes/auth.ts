@@ -2,7 +2,7 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { db, users } from "../db/index.js";
+import { db, users, preferences } from "../db/index.js";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -42,6 +42,11 @@ router.post("/register", async (req: Request, res: Response) => {
       .returning();
 
     const user = result[0];
+
+    await db.insert(preferences).values({
+      userId: user.id,
+      topic: "Selic"
+    });
 
     const token = jwt.sign(
       { userId: user.id, email: user.email },
